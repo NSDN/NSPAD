@@ -1,0 +1,10 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "USBDEV.C": "cpp",
+        "Compound Dev.C": "cpp",
+        "usb.h": "c",
+        "sys.h": "c",
+        "ch559.h": "c"
+    }
+}
