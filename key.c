@@ -161,7 +161,7 @@ const static uint8_c biKeyMap[2][4][6][2] = {
 #define TAB 0x09
 #define SFT 0x80
 
-const static uint8_c sinKeyMap[4][6] = {
+static uint8_c sinKeyMap[4][6] = {
     { ESC, '1', '2', '3', '4', '5' },
     { TAB, 'q', 'w', 'e', 'r', 't' },
     { SFT, 'a', 's', 'd', 'f', 'g' },
@@ -173,17 +173,22 @@ const static uint8_c sinKeyMap[4][6] = {
 #define PRE 0x83
 #define NEX 0x84
 
-const static uint8_c z81KeyMap[4][6] = {
+// ---------------------------- 组合键修改这里 ----------------------------
+#define MOD_CTRL    0x0100
+#define MOD_SHIFT   0x0200
+#define MOD_ALT     0x0400
+
+const static uint16_t z81KeyMap[4][6] = {
     { 'n', '0', '1', '2', '3', '4' },
     { 'a', 'b', '5', '6', '7', '8' },
     { 'c', 'd', '9', 'e', 'f', 'y' },
     { KNO, PLY, STP, PRE, NEX, KNO },
 };
+// ---------------------------- 组合键修改这里 ----------------------------
 
 __bit mode = 0, alter = 0;
 uint8_t prev = 0, now = 0;
 __bit shifted = 0;
-
 #define __press(i) ((BRx & (1 << i)) == 0)
 
 void biScanCol(uint8_t col) {
@@ -266,17 +271,20 @@ void sinScanCol(uint8_t col) {
             continue;
 
         if (__press(i)) {
-            if (btn == SFT)
+            if (btn == SFT) {
                 shifted = 1;
-            else {
+                now |= 0x80;
+            } else {
                 usbSetKeycode(2 + col, _asciimap[btn & 0x7F] & 0x7F);
 
                 now |= (1 << col);
                 count += 1;
             }
         } else {
-            if (btn == SFT)
+            if (btn == SFT) {
                 shifted = 0;
+                now &= ~0x80;
+            }
         }
     }
 
@@ -291,17 +299,16 @@ void z81ScanCol(uint8_t col) {
     delay_us(500);  // RC电路充电时间需要大约 470us
 
     usbSetKeycode(0, 1);
-    usbSetKeycode(1, 0);
 
     uint8_t count = 0;
     for (uint8_t i = 0; i < 4; i++) {
-        uint8_t btn = z81KeyMap[i][col];
+        uint16_t btn = z81KeyMap[i][col];
 
         if (btn == KNO)
             continue;
 
         if (__press(i)) {
-            uint8_t code = 0;
+            uint8_t code = 0, mod = 0;
             switch (btn) {
                 case PLY:
                     code = 0xCD;
@@ -327,6 +334,13 @@ void z81ScanCol(uint8_t col) {
                     usbSetKeycode(1, 0);
                     break;
                 default:
+                    if (btn & MOD_CTRL)
+                        mod |= 0x01;
+                    if (btn & MOD_SHIFT)
+                        mod |= 0x02;
+                    if (btn & MOD_ALT)
+                        mod |= 0x04;
+                    usbSetKeycode(1, mod);
                     usbSetKeycode(2 + col, _asciimap[btn & 0x7F] & 0x7F);
 
                     now |= (1 << col);

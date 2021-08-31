@@ -192,7 +192,7 @@ cvm_ret __instr_hidp(CVM_OP* op) {
 }
 
 /*
- * 将HID接收缓冲区内的数据看作字符串并模拟按键输入
+ * 将HID发送缓冲区内的数据看作字符串并模拟按键输入
  */
 cvm_ret __instr_strp(CVM_OP* op) {
     uint8_t t = op->type_dst_expr;
@@ -261,7 +261,7 @@ cvm_ret __instr_sleep(CVM_OP* op) {
  * 系统软复位
  */
 cvm_ret __instr_sysrst(CVM_OP* op) {
-    if (op->type_dst_expr == 0x55 && op->dst == 0xAA55) {
+    if (op->type_dst_expr == 0x55 && op->dst == 0x55AA) {
 		EA = 0;
         SAFE_MOD = 0x55;
         SAFE_MOD = 0xAA;

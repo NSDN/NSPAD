@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define HID_BUF_SIZE 32
+#define HID_BUF_SIZE 42
 
 void usbDevInit();
 
