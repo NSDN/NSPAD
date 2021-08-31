@@ -4,8 +4,7 @@
 #include "pin.h"
 
 void sysPinConfig() {
-    PORT_CFG &= ~(bP1_OC);
-    P1_PU &= ~(0x3F);
+    P1_PU &= ~(0x3F);       // P10~P15, Output Open-Drain
     P1_DIR = 0x3F;
 
     P4_DIR = 0x80;          // P47, Output
