@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+void loadKeyConfig();
 void scanKeys();
 
 #endif

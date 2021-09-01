@@ -250,6 +250,17 @@ cvm_ret __instr_wri(CVM_OP* op) {
 }
 
 /*
+ * 内部存储器块擦除
+ */
+cvm_ret __instr_erase(CVM_OP* op) {
+    if (op->type_dst_expr == 0xAA) {
+		romErase(op->dst);
+        return CVM_RET_OK;
+    }
+    return CVM_RET_ERR;
+}
+
+/*
  * 延时一段时间，单位为毫秒
  */
 cvm_ret __instr_sleep(CVM_OP* op) {

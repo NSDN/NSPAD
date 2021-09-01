@@ -5,6 +5,7 @@
 #include "usb.h"
 #include "key.h"
 #include "cvm.h"
+#include "rom.h"
 
 void __usbDeviceInterrupt() __interrupt (INT_NO_USB) __using (1);
 void __tim2Interrupt() __interrupt (INT_NO_TMR2) __using (2);
@@ -47,6 +48,8 @@ void main() {
     delay(250);
     LED = !LED;
     delay(250);
+
+    loadKeyConfig();
 
     uint8_t prevMode = 0;
 

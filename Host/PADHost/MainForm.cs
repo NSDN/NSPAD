@@ -21,6 +21,8 @@ namespace PADHost
 
             public static LogCore GetSimCore(string code)
             {
+                // 防止仅使用了无操作数指令时, Run() 返回 null (即 prevDstReg 为 null)
+                code += "\n___ \"END OF CODE\"\n";
                 var c = Util.GetSegments(code);
                 return new LogCore(c);
             }
@@ -43,6 +45,11 @@ namespace PADHost
 
             protected override void LoadFuncList()
             {
+                funcList.Add("___", (dst, src, ext) =>
+                {
+                    return Result.OK;
+                });
+
                 funcList.Add("nop", (dst, src, ext) =>
                 {
                     if (src != null) return Result.ERR;
@@ -160,6 +167,21 @@ namespace PADHost
                     return Result.OK;
                 });
 
+                funcList.Add("erase", (dst, src, ext) =>
+                {
+                    if (src == null) return Result.ERR;
+                    if (dst == null) return Result.ERR;
+                    if (src.type != RegType.CHAR && src.type != RegType.INT)
+                        return Result.ERR;
+                    if (dst.type != RegType.CHAR && dst.type != RegType.INT)
+                        return Result.ERR;
+
+                    ushort s = (ushort)((int)src.data & 0xFFFF);
+                    byte d = (byte)((int)dst.data & 0xFF);
+                    byteCode.Add(new byte[] { 0x0A, d, (byte)(s & 0xFF), (byte)(s >> 8) });
+                    return Result.OK;
+                });
+
                 funcList.Add("sleep", (dst, src, ext) =>
                 {
                     if (src != null) return Result.ERR;
@@ -168,7 +190,7 @@ namespace PADHost
                         return Result.ERR;
 
                     byte d = (byte)((int)dst.data & 0xFFFF);
-                    byteCode.Add(new byte[] { 0x0A, 0x00, (byte)(d & 0xFF), (byte)(d >> 8) });
+                    byteCode.Add(new byte[] { 0x0B, 0x00, (byte)(d & 0xFF), (byte)(d >> 8) });
                     return Result.OK;
                 });
 
@@ -183,7 +205,7 @@ namespace PADHost
 
                     ushort s = (ushort)((int)src.data & 0xFFFF);
                     byte d = (byte)((int)dst.data & 0xFF);
-                    byteCode.Add(new byte[] { 0x0B, d, (byte)(s & 0xFF), (byte)(s >> 8) });
+                    byteCode.Add(new byte[] { 0x0C, d, (byte)(s & 0xFF), (byte)(s >> 8) });
                     return Result.OK;
                 });
             }

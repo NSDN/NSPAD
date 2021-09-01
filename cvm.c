@@ -31,6 +31,7 @@ static __code CVM_FUNC cvmFuncList[] = {
     { &__instr_keyp,    CVM_OP_NARG },
     { &__instr_ldi,     CVM_OP_DST },
     { &__instr_wri,     CVM_OP_DST },
+    { &__instr_erase,   CVM_OP_DST },
     { &__instr_sleep,   CVM_OP_DST },
     { &__instr_sysrst,  CVM_OP_DST },
 };

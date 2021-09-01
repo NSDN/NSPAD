@@ -178,7 +178,7 @@ static uint8_c sinKeyMap[4][6] = {
 #define MOD_SHIFT   0x0200
 #define MOD_ALT     0x0400
 
-const static uint16_t z81KeyMap[4][6] = {
+static uint16_t z81KeyMap[4][6] = {
     { 'n', '0', '1', '2', '3', '4' },
     { 'a', 'b', '5', '6', '7', '8' },
     { 'c', 'd', '9', 'e', 'f', 'y' },
@@ -385,6 +385,26 @@ void scanKeys() {
             prev = now;
 
             usbPushKeydata();
+        }
+    }
+}
+
+const static __code uint16_t __at (DATA_FLASH_ADDR + 0) z81CustomFlag;
+const static __code uint16_t __at (DATA_FLASH_ADDR + 2) z81KeyConf[4][6];
+
+/**
+ * 当前仅对z81模式进行修改
+ **/
+void loadKeyConfig() {
+    if (z81CustomFlag == 0xA5A5) {
+        for (uint8_t i = 0; i < 4; i++) {
+            for (uint8_t j = 0; j < 6; j++) {
+                z81KeyMap[i][j] = z81KeyConf[i][j];
+                if (z81KeyMap[i][j] == 0xFFFF)
+                    z81KeyMap[i][j] = 0x0000;
+                if ((i == 3) && (j == 0 || j == 5))
+                    z81KeyMap[i][j] = KNO;
+            }
         }
     }
 }

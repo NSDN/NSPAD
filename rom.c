@@ -3,6 +3,13 @@
 #include "ch559.h"
 #include "sys.h"
 
+/**
+ * 需人工操作写入控制，因此额外提供了擦除函数，每次写入前需全片擦除
+ * 这样就不会每写入一个字节都要整个块都擦除，存储器寿命更长
+ **/
+
+static uint8_c __at (DATA_FLASH_ADDR) ROM[FLASH_SIZE];
+
 /*
  * 内部存储器写入
  */
@@ -24,7 +31,24 @@ void __flash_write(uint16_t addr, uint16_t data) {
  */
 uint8_t __flash_read(uint16_t addr) {
     addr &= (FLASH_SIZE - 1);
-    return (uint8_t) (*(uint8_c*) (DATA_FLASH_ADDR + addr));
+    return ROM[addr];
+}
+
+/*
+ * 存储器块擦除，现阶段 addr 只取 0xAA55, 以保证安全
+ */
+void romErase(uint16_t addr) {
+    if (addr != 0xAA55)
+        return;
+
+    SAFE_MOD = 0x55;
+    SAFE_MOD = 0xAA;
+    GLOBAL_CFG |= bDATA_WE;
+    ROM_ADDR = DATA_FLASH_ADDR;
+    ROM_CTRL = 0xA6;
+    SAFE_MOD = 0x55;
+    SAFE_MOD = 0xAA;
+    GLOBAL_CFG &= ~bDATA_WE;
 }
 
 /*
