@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PADHost", "PADHost.csproj", "{DF068E7D-5671-48C8-BECF-CB2D5D6856A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PADCore", "..\PADCore\PADCore.csproj", "{0572D134-6861-4555-A6ED-9761AA4DA0B6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF068E7D-5671-48C8-BECF-CB2D5D6856A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF068E7D-5671-48C8-BECF-CB2D5D6856A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF068E7D-5671-48C8-BECF-CB2D5D6856A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF068E7D-5671-48C8-BECF-CB2D5D6856A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0572D134-6861-4555-A6ED-9761AA4DA0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0572D134-6861-4555-A6ED-9761AA4DA0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0572D134-6861-4555-A6ED-9761AA4DA0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0572D134-6861-4555-A6ED-9761AA4DA0B6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94A5D1F8-3B5C-475B-921C-DBA0D84315CB}
+	EndGlobalSection
+EndGlobal
