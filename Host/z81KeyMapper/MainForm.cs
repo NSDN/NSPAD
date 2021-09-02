@@ -11,10 +11,14 @@ namespace z81KeyMapper
         private const ushort MOD_SHIFT = 0x0200;
         private const ushort MOD_ALT = 0x0400;
 
-        private const ushort MED_PLAY = 0x0081;
-        private const ushort MED_STOP = 0x0082;
-        private const ushort MED_PREV = 0x0083;
-        private const ushort MED_NEXT = 0x0084;
+        private const ushort MED_PLAY = 0x8001;
+        private const ushort MED_STOP = 0x8002;
+        private const ushort MED_PREV = 0x8003;
+        private const ushort MED_NEXT = 0x8004;
+        private const ushort KEY_LEFT = 0x8005;
+        private const ushort KEY_UP = 0x8006;
+        private const ushort KEY_RIGHT = 0x8007;
+        private const ushort KEY_DOWN = 0x8008;
 
         private NSPAD pad;
 
@@ -73,7 +77,33 @@ namespace z81KeyMapper
 
         private void BtnXX_KeyMod(object sender, KeyEventArgs e)
         {
-            if (currKey != null && e.KeyValue <= 0x7F)
+            int val = e.KeyValue;
+            switch (val)
+            {
+                case 37:    // Left
+                    val = KEY_LEFT;
+                    break;
+                case 38:    // Up
+                    val = KEY_UP;
+                    break;
+                case 39:    // Right
+                    val = KEY_RIGHT;
+                    break;
+                case 40:    // Down
+                    val = KEY_DOWN;
+                    break;
+                case '<' | 0x80:
+                    val = ',';
+                    break;
+                case '>' | 0x80:
+                    val = '.';
+                    break;
+                default:
+                    if (val > 0x7F)
+                        return;
+                    break;
+            }
+            if (currKey != null)
             {
                 string str = ""; ushort code = 0x0000;
                 if (e.Control)
@@ -91,10 +121,40 @@ namespace z81KeyMapper
                     str += "Shift + ";
                     code |= MOD_SHIFT;
                 }
-                byte k = (byte)(e.KeyValue & 0x7F);
-
-                str += (char)k;
-                code |= k;
+                switch (val)
+                {
+                    case 0x08:
+                        str += "[Backspace]";
+                        break;
+                    case 0x09:
+                        str += "[TAB]";
+                        break;
+                    case 0x0D:
+                        str += "[Enter]";
+                        break;
+                    case 0x1B:
+                        str += "[ESC]";
+                        break;
+                    case 0x20:
+                        str += "[Space]";
+                        break;
+                    case KEY_LEFT:
+                        str += "[Left]";
+                        break;
+                    case KEY_UP:
+                        str += "[Up]";
+                        break;
+                    case KEY_RIGHT:
+                        str += "[Right]";
+                        break;
+                    case KEY_DOWN:
+                        str += "[Down]";
+                        break;
+                    default:
+                        str += (char)(val & 0x7F);
+                        break;
+                }
+                code |= (ushort)val;
                 currKey.Text = str;
                 keyConf[currR][currC] = code;
 
@@ -117,6 +177,9 @@ namespace z81KeyMapper
                         {
                             switch (v)
                             {
+                                case 0xFFFF:
+                                    btn.Text = "";
+                                    break;
                                 case MED_PLAY:
                                     btn.Text = "[播放]";
                                     break;
@@ -137,7 +200,39 @@ namespace z81KeyMapper
                                         btn.Text += "Alt + ";
                                     if ((v & MOD_SHIFT) != 0)
                                         btn.Text += "Shift + ";
-                                    btn.Text += (char)(v & 0x7F);
+                                    switch (v)
+                                    {
+                                        case 0x08:
+                                            btn.Text += "[Backspace]";
+                                            break;
+                                        case 0x09:
+                                            btn.Text += "[Tab]";
+                                            break;
+                                        case 0x0D:
+                                            btn.Text += "[Enter]";
+                                            break;
+                                        case 0x1B:
+                                            btn.Text += "[ESC]";
+                                            break;
+                                        case 0x20:
+                                            btn.Text += "[Space]";
+                                            break;
+                                        case KEY_LEFT:
+                                            btn.Text += "[Left]";
+                                            break;
+                                        case KEY_UP:
+                                            btn.Text += "[Up]";
+                                            break;
+                                        case KEY_RIGHT:
+                                            btn.Text += "[Right]";
+                                            break;
+                                        case KEY_DOWN:
+                                            btn.Text += "[Down]";
+                                            break;
+                                        default:
+                                            btn.Text += (char)(v & 0x7F);
+                                            break;
+                                    }
                                     break;
                             }
                         }

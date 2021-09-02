@@ -273,6 +273,7 @@ cvm_ret __instr_sleep(CVM_OP* op) {
  */
 cvm_ret __instr_sysrst(CVM_OP* op) {
     if (op->type_dst_expr == 0x55 && op->dst == 0x55AA) {
+		delay(500);
 		EA = 0;
         SAFE_MOD = 0x55;
         SAFE_MOD = 0xAA;

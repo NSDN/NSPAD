@@ -1,9 +1,9 @@
-﻿using HID;
-using PADCore;
-
-using System;
+﻿using System;
 using System.Threading;
 using System.Collections.Generic;
+
+using HID;
+using PADCore;
 
 namespace PADLib
 {
@@ -66,8 +66,11 @@ namespace PADLib
             ptr = new IntPtr(-1);
         }
 
+        protected bool flag = false;
+
         protected void SendCmds(params byte[][] cmds)
         {
+            flag = false;
             new Thread(new ThreadStart(() =>
             {
                 Report report; int index = 0;
@@ -94,7 +97,25 @@ namespace PADLib
                         buf.Clear();
                     }
                 }
+
+                Thread.Sleep(50);
+                flag = true;
             })).Start();
+        }
+
+        delegate bool Check();
+
+        bool Deley4Max(int ms, Check check)
+        {
+            int t = 0;
+            while (t < ms)
+            {
+                Thread.Sleep(1);
+                if (check.Invoke())
+                    return true;
+                t += 1;
+            }
+            return false;
         }
 
         public ushort[][] ReadConfig()
@@ -120,8 +141,8 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            while (recBytes.Count < 1)
-                Thread.Sleep(1);
+            if (!Deley4Max(1000, () => recBytes.Count == 1))
+                return null;
 
             exe = PADASM.GetExecutor(
                 "  .clr" + "\n" +
@@ -137,8 +158,8 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            while (recBytes.Count < 2)
-                Thread.Sleep(1);
+            if (!Deley4Max(1000, () => recBytes.Count == 2))
+                return null;
 
             exe = PADASM.GetExecutor(
                 "  .clr" + "\n" +
@@ -154,8 +175,8 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            while (recBytes.Count < 3)
-                Thread.Sleep(1);
+            if (!Deley4Max(1000, () => recBytes.Count == 3))
+                return null;
 
             int ptr = 0;
             ushort[][] conf = new ushort[4][];
@@ -202,6 +223,8 @@ namespace PADLib
             if (exe.Run() == null)
                 return;
             SendCmds(exe.GetBytes());
+            Deley4Max(1000, () => flag);
+            Close();
         }
     }
 }

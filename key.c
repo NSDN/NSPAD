@@ -168,10 +168,15 @@ static uint8_c sinKeyMap[4][6] = {
     { KNO, 'z', 'x', ' ', 'v', KNO },
 };
 
-#define PLY 0x81
-#define STP 0x82
-#define PRE 0x83
-#define NEX 0x84
+#define PLY 0x8001
+#define STP 0x8002
+#define PRE 0x8003
+#define NEX 0x8004
+
+#define LEFT    0x8005
+#define UP      0x8006
+#define RIGHT   0x8007
+#define DOWN    0x8008
 
 // ---------------------------- 组合键修改这里 ----------------------------
 #define MOD_CTRL    0x0100
@@ -340,8 +345,25 @@ void z81ScanCol(uint8_t col) {
                         mod |= 0x02;
                     if (btn & MOD_ALT)
                         mod |= 0x04;
+                    switch (btn) {
+                        case LEFT:
+                            code = 0x50;
+                            break;
+                        case UP:
+                            code = 0x52;
+                            break;
+                        case RIGHT:
+                            code = 0x4F;
+                            break;
+                        case DOWN:
+                            code = 0x51;
+                            break;
+                        default:
+                            code = _asciimap[btn & 0x7F] & 0x7F;
+                            break;
+                    }
                     usbSetKeycode(1, mod);
-                    usbSetKeycode(2 + col, _asciimap[btn & 0x7F] & 0x7F);
+                    usbSetKeycode(2 + col, code);
 
                     now |= (1 << col);
                     count += 1;
