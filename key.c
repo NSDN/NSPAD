@@ -157,15 +157,18 @@ const static uint8_c biKeyMap[2][4][6][2] = {
     }
 };
 
-#define ESC 0x27
-#define TAB 0x09
-#define SFT 0x80
-
 static uint8_c sinKeyMap[4][6] = {
-    { ESC, '1', '2', '3', '4', '5' },
-    { TAB, 'q', 'w', 'e', 'r', 't' },
-    { SFT, 'a', 's', 'd', 'f', 'g' },
-    { KNO, 'z', 'x', ' ', 'v', KNO },
+    { 0x5F, 0x60, 0x61, 0x57, 0x36, 0x2A },
+    { 0x5C, 0x5D, 0x5E, 0x56, 0xB6, 0x29 },
+    { 0x59, 0x5A, 0x5B, 0x55, 0xB7, 0x58 },
+    { 0x00, 0x62, 0x63, 0x54, 0x53, 0x00 },
+};
+
+static uint8_c padKeyMap[4][6] = {
+    {  1,  2,  3,  4,  5,  6 },
+    {  7,  8,  9, 10, 11, 12 },
+    { 13, 14, 15, 16, 17, 18 },
+    {  0, 19, 20, 21, 22,  0 },
 };
 
 #define PLY 0x8001
@@ -193,7 +196,6 @@ static uint16_t z81KeyMap[4][6] = {
 
 __bit mode = 0, alter = 0;
 uint8_t prev = 0, now = 0;
-__bit shifted = 0;
 #define __press(i) ((BRx & (1 << i)) == 0)
 
 void biScanCol(uint8_t col) {
@@ -266,36 +268,51 @@ void sinScanCol(uint8_t col) {
     delay_us(500);  // RC电路充电时间需要大约 470us
 
     usbSetKeycode(0, 1);
-    usbSetKeycode(1, shifted ? 0x02 : 0x00);
+    usbSetKeycode(1, 0);
 
     uint8_t count = 0;
     for (uint8_t i = 0; i < 4; i++) {
         uint8_t btn = sinKeyMap[i][col];
 
-        if (btn == KNO)
+        if (btn == 0x00)
             continue;
 
         if (__press(i)) {
-            if (btn == SFT) {
-                shifted = 1;
-                now |= 0x80;
-            } else {
-                usbSetKeycode(2 + col, _asciimap[btn & 0x7F] & 0x7F);
-
-                now |= (1 << col);
-                count += 1;
-            }
-        } else {
-            if (btn == SFT) {
-                shifted = 0;
-                now &= ~0x80;
-            }
+            usbSetKeycode(2 + col, btn);
+            now |= (1 << col);
+            count += 1;
         }
     }
 
     if (count == 0) {
         usbSetKeycode(2 + col, 0);
         now &= ~(1 << col);
+    }
+}
+
+volatile uint32_t padTmp = 0;
+volatile uint8_t padBuf[4] = { 0 };
+
+void padScanCol(uint8_t col) {
+    BCx = ~(0x01 << col);
+    delay_us(500);  // RC电路充电时间需要大约 470us
+
+    usbSetKeycode(0, 3);
+
+    for (uint8_t i = 0; i < 4; i++) {
+        uint8_t btn = padKeyMap[i][col];
+
+        if (btn == 0x00)
+            continue;
+
+        btn = btn - 1;
+        uint8_t j = btn / 8, k = btn % 8;
+        if (__press(i))
+            padBuf[j] |= 1 << k;
+        else
+            padBuf[j] &= ~(1 << k);
+
+        usbSetKeycode(1 + j, padBuf[j]);
     }
 }
 
@@ -388,7 +405,7 @@ void scanKeys() {
             colScanFunc = &biScanCol;
             break;
         case 0x2:
-            colScanFunc = &biScanCol;
+            colScanFunc = &padScanCol;
             break;
         case 0x3:
             colScanFunc = &z81ScanCol;
@@ -405,6 +422,13 @@ void scanKeys() {
 
         if (prev != now) {
             prev = now;
+
+            usbPushKeydata();
+        }
+
+        uint32_t* ptr = (uint32_t*) (&(padBuf[0]));
+        if (padTmp != *ptr) {
+            padTmp = *ptr;
 
             usbPushKeydata();
         }

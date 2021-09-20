@@ -2,11 +2,13 @@
 #define __INSTR_H
 
 #include "cvm.h"
-#include "rom.h"
-#include "sys.h"
-#include "usb.h"
-
 #include "ch559.h"
+
+#include "sys.h"
+#include "pin.h"
+#include "usb.h"
+#include "rom.h"
+#include "key.h"
 
 #define SHIFT 0x80
 static uint8_c _asciimap[128] = {	// 模拟字符串输入用的查找表
@@ -281,6 +283,22 @@ cvm_ret __instr_sysrst(CVM_OP* op) {
         return CVM_RET_OK;
     }
     return CVM_RET_ERR;
+}
+
+/*
+ * 重加载配置
+ */
+cvm_ret __instr_reload(CVM_OP* op) {
+	DUMMY_THING(op);
+	
+    LED = !LED;
+    delay(250);
+    LED = !LED;
+    delay(250);
+
+    loadKeyConfig();
+
+    return CVM_RET_OK;
 }
 
 #endif

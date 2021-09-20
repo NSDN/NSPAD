@@ -34,6 +34,7 @@ static __code CVM_FUNC cvmFuncList[] = {
     { &__instr_erase,   CVM_OP_DST },
     { &__instr_sleep,   CVM_OP_DST },
     { &__instr_sysrst,  CVM_OP_DST },
+    { &__instr_reload,  CVM_OP_NARG }
 };
 /* ---------------- 指令注册结束 ---------------- */
 

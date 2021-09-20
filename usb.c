@@ -5,6 +5,7 @@
 
 #include "ch559.h"
 #include "sys.h"
+#include "pin.h"
 
 #define THIS_ENDP0_SIZE DEFAULT_ENDP0_SIZE
 
@@ -53,7 +54,7 @@ const uint8_c usbCfgDesc[] = {
     0x00,        //   bCountryCode
     0x01,        //   bNumDescriptors
     0x22,        //   bDescriptorType[0] (HID)
-    0x45, 0x00,  //   wDescriptorLength[0] 69
+    0x74, 0x00,  //   wDescriptorLength[0] 116
 
     0x07,        //   bLength
     0x05,        //   bDescriptorType (Endpoint)
@@ -146,6 +147,15 @@ const uint8_c KeyRepDesc[] = {
     0x75, 0x08,        //   Report Size (8)
     0x95, 0x08,        //   Report Count (8)
     0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x08,        //   Usage Page (LEDs)
+    0x19, 0x01,        //   Usage Minimum (Num Lock)
+    0x29, 0x03,        //   Usage Maximum (Scroll Lock)
+    0x95, 0x03,        //   Report Count (5)
+    0x75, 0x01,        //   Report Size (1)
+    0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x95, 0x05,        //   Report Count (5)
+    0x75, 0x01,        //   Report Size (1)
+    0x91, 0x01,        //   Output (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
     0xC0,              // End Collection
     0x05, 0x0C,        // Usage Page (Consumer)
     0x09, 0x01,        // Usage (Consumer Control)
@@ -159,6 +169,21 @@ const uint8_c KeyRepDesc[] = {
     0x75, 0x10,        //   Report Size (16)
     0x95, 0x01,        //   Report Count (1)
     0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC0,              // End Collection
+    0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    0x09, 0x05,        // Usage (Game Pad)
+    0xA1, 0x01,        // Collection (Application)
+    0x85, 0x03,        //   Report ID (3)
+    0x05, 0x09,        //   Usage Page (Button)
+    0x19, 0x01,        //   Usage Minimum (0x01)
+    0x29, 0x16,        //   Usage Maximum (0x16)
+    0x15, 0x00,        //   Logical Minimum (0)
+    0x25, 0x01,        //   Logical Maximum (1)
+    0x75, 0x01,        //   Report Size (1)
+    0x95, 0x16,        //   Report Count (22)
+    0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x95, 0x02,        //   Report Count (2)
+    0x81, 0x03,        //   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
     0xC0,              // End Collection
 };
 const uint8_c MouseRepDesc[] = {
@@ -195,14 +220,14 @@ const uint8_c CustomRepDesc[] = {
     0x09, 0x01,        // Usage (0x01)
     0xA1, 0x01,        // Collection (Application)
     0x85, 0xAA,        //   Report ID (170)
-    0x95, HID_BUF_SIZE,//   Report Count (32)
+    0x95, HID_BUF_SIZE,//   Report Count (XX)
     0x75, 0x08,        //   Report Size (8)
     0x25, 0x01,        //   Logical Maximum (1)
     0x15, 0x00,        //   Logical Minimum (0)
     0x09, 0x01,        //   Usage (0x01)
     0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
     0x85, 0x55,        //   Report ID (85)
-    0x95, HID_BUF_SIZE,//   Report Count (32)
+    0x95, HID_BUF_SIZE,//   Report Count (XX)
     0x75, 0x08,        //   Report Size (8)
     0x25, 0x01,        //   Logical Maximum (1)
     0x15, 0x00,        //   Logical Minimum (0)
@@ -218,10 +243,10 @@ const uint8_c usbProdDesc[] = { 0x1A, 0x03,
     'K',0x00,'e',0x00,'y',0x00,'p',0x00,'a',0x00,'d',0x00
 };
 const uint8_c usbSerialDesc[] = { 0x0A, 0x03, '0', 0, '0', 0, '0', 0, '0', 0 };
-const uint8_c usbCfgStrDesc[] = { 0x12, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, ' ', 0, 'U', 0, 'S', 0, 'B', 0 };
-const uint8_c usbKeyStrDesc[] = { 0x18, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, ' ', 0, 'K', 0, 'e', 0, 'y', 0, 'p', 0, 'a', 0, 'd', 0 };
-const uint8_c usbMseStrDesc[] = { 0x16, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, ' ', 0, 'M', 0, 'o', 0, 'u', 0, 's', 0, 'e', 0 };
-const uint8_c usbCusStrDesc[] = { 0x18, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, ' ', 0, 'C', 0, 'u', 0, 's', 0, 't', 0, 'o', 0, 'm', 0 };
+const uint8_c usbCfgStrDesc[] = { 0x12, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, '-', 0, 'U', 0, 'S', 0, 'B', 0 };
+const uint8_c usbKeyStrDesc[] = { 0x16, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, '-', 0, 'N', 0, 'S', 0, 'P', 0, 'A', 0, 'D', 0 };
+const uint8_c usbMseStrDesc[] = { 0x16, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, '-', 0, 'M', 0, 'o', 0, 'u', 0, 's', 0, 'e', 0 };
+const uint8_c usbCusStrDesc[] = { 0x18, 0x03, 'N', 0, 'S', 0, 'D', 0, 'N', 0, '-', 0, 'C', 0, 'u', 0, 's', 0, 't', 0, 'o', 0, 'm', 0 };
 // START at 0x0000
 uint8_x __at (0x0000) Ep0Buffer[THIS_ENDP0_SIZE];                                           //端点0 OUT&IN缓冲区，必须是偶地址
 uint8_x __at (0x0008) Ep1Buffer[MAX_PACKET_SIZE];                                           //端点1 IN缓冲区,必须是偶地址
@@ -499,8 +524,10 @@ void __usbDeviceInterrupt() __interrupt (INT_NO_USB) __using (1) {
                         case 0x09:
                             if (Ep0Buffer[0])  {
                                 //printf("Light on Num Lock LED!\n");
+                                LED = !LED;
                             } else if (Ep0Buffer[0] == 0) {
                                 //printf("Light off Num Lock LED!\n");
+                                LED = !LED;
                             }
                             break;
 						default:
@@ -608,6 +635,7 @@ void usbPushKeydata() {
     uint8_t type = HIDKey[0];
     if (type == 0x01) len = sizeof(HIDKey);
     else if (type == 0x02) len = 3;
+    else if (type == 0x03) len = 4;
     if (type > 0) {
         memcpy(Ep1Buffer, HIDKey, len);
         UEP1_T_LEN = len;

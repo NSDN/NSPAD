@@ -210,6 +210,15 @@ namespace PADCore
                 byteCode.Add(new byte[] { 0x0C, d, (byte)(s & 0xFF), (byte)(s >> 8) });
                 return Result.OK;
             });
+
+            funcList.Add(".reload", (dst, src, ext) =>
+            {
+                if (src != null) return Result.ERR;
+                if (dst != null) return Result.ERR;
+
+                byteCode.Add(new byte[] { 0x0D });
+                return Result.OK;
+            });
         }
 
         protected override void LoadParamList()

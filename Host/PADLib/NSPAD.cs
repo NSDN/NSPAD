@@ -64,6 +64,7 @@ namespace PADLib
             if ((int)ptr != -1)
                 hid.CloseDevice(ptr);
             ptr = new IntPtr(-1);
+            Connected = false;
         }
 
         protected bool flag = false;
@@ -107,13 +108,13 @@ namespace PADLib
 
         bool Deley4Max(int ms, Check check)
         {
-            int t = 0;
-            while (t < ms)
+            long T() { return DateTime.Now.Ticks / 10000; }
+            long t = T();
+            while ((T() - t) < ms)
             {
                 Thread.Sleep(1);
                 if (check.Invoke())
                     return true;
-                t += 1;
             }
             return false;
         }
@@ -121,7 +122,10 @@ namespace PADLib
         public ushort[][] ReadConfig()
         {
             if (!Connected)
+            {
                 Connect();
+                Thread.Sleep(50);
+            }
 
             if (!Connected)
                 return null;
@@ -141,7 +145,7 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            if (!Deley4Max(1000, () => recBytes.Count == 1))
+            if (!Deley4Max(2000, () => recBytes.Count == 1))
                 return null;
 
             exe = PADASM.GetExecutor(
@@ -158,7 +162,7 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            if (!Deley4Max(1000, () => recBytes.Count == 2))
+            if (!Deley4Max(2000, () => recBytes.Count == 2))
                 return null;
 
             exe = PADASM.GetExecutor(
@@ -175,7 +179,7 @@ namespace PADLib
             if (exe.Run() == null)
                 return null;
             SendCmds(exe.GetBytes());
-            if (!Deley4Max(1000, () => recBytes.Count == 3))
+            if (!Deley4Max(2000, () => recBytes.Count == 3))
                 return null;
 
             int ptr = 0;
@@ -193,13 +197,16 @@ namespace PADLib
             return conf;
         }
 
-        public void WriteConfig(ushort[][] conf)
+        public bool WriteConfig(ushort[][] conf)
         {
             if (!Connected)
+            {
                 Connect();
+                Thread.Sleep(50);
+            }
 
             if (!Connected)
-                return;
+                return false;
 
             string code = "";
             code += ".erase 0xAA, 0xAA55" + "\n";
@@ -218,13 +225,20 @@ namespace PADLib
                 }
             }
 
-            code += ".sysrst 0x55, 0x55AA" + "\n";
+            //code += ".sysrst 0x55, 0x55AA" + "\n";
+            code += ".reload" + "\n";
             PADASM exe = PADASM.GetExecutor(code);
             if (exe.Run() == null)
-                return;
+                return false;
             SendCmds(exe.GetBytes());
-            Deley4Max(1000, () => flag);
-            Close();
+            if (!Deley4Max(3000, () => flag))
+            {
+                //Close();
+                return false;
+            }
+
+            //Close();
+            return true;
         }
     }
 }

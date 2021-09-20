@@ -241,13 +241,20 @@ namespace z81KeyMapper
                 currKey = null;
                 currR = -1; currC = -1;
             }
+            else
+            {
+                MessageBox.Show("请尝试重新为设备上电", "读出失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             btnPull.Enabled = true;
         }
 
         private void btnPush_Click(object sender, EventArgs e)
         {
             btnPush.Enabled = false;
-            pad.WriteConfig(keyConf);
+            if (!pad.WriteConfig(keyConf))
+            {
+                MessageBox.Show("请尝试重新为设备上电", "写入失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             btnPush.Enabled = true;
         }
 
