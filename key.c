@@ -20,7 +20,7 @@ const static uint8_c _asciimap[128] = {
     0x28,			  // LF	Enter
     0x00,             // VT
     0x00,             // FF
-    0x00,             // CR
+    0x28,             // CR
     0x00,             // SO
     0x00,             // SI
     0x00,             // DEL
